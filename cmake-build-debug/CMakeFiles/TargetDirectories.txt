@@ -1,0 +1,3 @@
+C:/Users/jamis/CLionProjects/Tron_Reuploaded/cmake-build-debug/CMakeFiles/Tron_Reuploaded.dir
+C:/Users/jamis/CLionProjects/Tron_Reuploaded/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/jamis/CLionProjects/Tron_Reuploaded/cmake-build-debug/CMakeFiles/rebuild_cache.dir

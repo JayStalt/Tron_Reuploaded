@@ -1,6 +1,6 @@
 import { gameLoop, resetGame, setSceneCallback } from './lightcycle.js';
 import { drawMenu, handleMenuInput, unlockNextGame } from './menu.js';
-import { tankGameLoop, setSceneCallback as setTankScene } from './tank.js';
+import { tankGameLoop, setSceneCallback as setTankScene } from './tanks.js';
 import { drawEndGame } from './endGame.js';
 
 const canvas = document.getElementById('gameCanvas');

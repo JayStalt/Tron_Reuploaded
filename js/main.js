@@ -1,6 +1,7 @@
 import { gameLoop, resetGame, setSceneCallback } from './lightcycle.js';
 import { drawMenu, handleMenuInput, unlockNextGame } from './menu.js';
 import { tankGameLoop, setSceneCallback as setTankScene } from './tanks.js';
+import { gridbugGameLoop, setSceneCallbackGridbug } from './gridbug.js';
 import { drawEndGame } from './endGame.js';
 
 const canvas = document.getElementById('gameCanvas');
@@ -18,6 +19,7 @@ function changeScene(sceneName) {
 // Register scene switching callbacks
 setSceneCallback(changeScene);
 setTankScene(changeScene);
+setSceneCallbackGridbug(changeScene);
 
 document.addEventListener('keydown', (event) => {
     if (currentScene === 'menu') {
@@ -32,6 +34,8 @@ function runGame() {
         gameLoop(ctx);
     } else if (currentScene === 'tank') {
         tankGameLoop(ctx);
+    } else if (currentScene === 'gridbug') {
+        gridbugGameLoop(ctx);
     } else if (currentScene === 'endgame') {
         drawEndGame(ctx);
     }

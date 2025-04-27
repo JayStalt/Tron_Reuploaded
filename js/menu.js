@@ -5,7 +5,7 @@ const menuOptions = ["Lightcycle", "Gridbug", "Tank", "MCP Cone"];
 let selectedOption = 0;
 
 // Initially only Lightcycle is unlocked
-let unlockedGames = [true, false, true, false];
+let unlockedGames = [true, true, true, false];
 
 function drawMenu(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);

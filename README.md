@@ -1,77 +1,36 @@
 Tron_Reuploaded 🎮
-A custom-built recreation of the classic TRON Arcade experience using JavaScript, HTML5 Canvas, and modular scene management.
+A custom recreation of the classic TRON Arcade experience, built using a custom JavaScript engine and HTML5 Canvas.
 
-🚀 Features
-Main Menu System
-Choose between classic mini-games:
+✨ Features
+Custom Main Menu System
 
-Lightcycle
-
-Tank
-
-(Gridbug and MCP Cone coming soon!)
+Navigate and select unlocked mini-games
 
 Lightcycle Mini-Game
 
-Grid-based movement
-
-Enemy AI that aggressively chases the player
-
-Collision detection and endgame screen
+Fast-paced grid racing and aggressive enemy AI
 
 Tank Mini-Game
 
-Player-controlled tank
-
-Rotation, movement, and bullet firing
-
-Maze wall collision
-
-Bullet physics and simple cooldown system
+Directional tank combat with enemy tanks that actively pursue and fire
 
 Endgame Screen
 
-Retro-style score and ranking display
+Retro arcade-style Game Over screen and score handling
 
-Auto-returns to the main menu after 10 seconds
+Unlock Progression
+
+Win Lightcycle to unlock Tank mini-game
 
 🎮 Controls
-Menu Navigation
 
-Arrow Up / W – Move up
-
-Arrow Down / S – Move down
-
-Enter or Space – Select game
-
-Lightcycle Controls
-
-Arrow Keys – Move
-
-Tank Controls
-
-Arrow Left / A – Rotate tank left
-
-Arrow Right / D – Rotate tank right
-
-Arrow Up / W – Move forward
-
-Space / Enter – Fire bullet
-
-📂 Project Structure
-css
-Copy
-Edit
-/Tron_Reuploaded/
-├── index.html
-└── js/
-├── main.js
-├── menu.js
-├── lightcycle.js
-├── tank.js
-└── endGame.js
+Action	Keys
+Navigate Menu	Arrow Keys / W/S
+Select Menu Option	Enter or Space
+Move Tank / Lightcycle	Arrow Keys / WASD
+Fire Bullet (Tank)	Space or Enter
 ⚙️ How to Run Locally
-Clone the repository:
+Clone this repository:
 
 bash
 Copy
@@ -80,12 +39,38 @@ git clone https://github.com/JayStalt/Tron_Reuploaded.git
 cd Tron_Reuploaded
 Start a local server:
 
-Using Python:
+Using Python 3:
 
-nginx
+bash
 Copy
 Edit
 python -m http.server
-Or use VS Code's Live Server extension
+Or use a VS Code extension like Live Server
 
-Open http://localhost:8000/index.html in your browser.
+Open your browser and navigate to:
+
+bash
+Copy
+Edit
+http://localhost:8000/index.html
+📸 Screenshots
+(Optional if you want to add some later!)
+
+
+Lightcycle Gameplay	Tank Gameplay
+(Insert Screenshot)	(Insert Screenshot)
+📈 Future Plans
+Add Gridbug and MCP mini-games
+
+Implement full retro background music and SFX
+
+Upgrade visuals: animated trails, tank sprites
+
+Add difficulty levels (speed increases, enemy buffs)
+
+🏆 Credits
+Developer: Jay Stalt
+Built for: Final Project - Video Game Design Class
+
+🚀 "Inspired by the spirit of the original TRON arcade, but rebuilt from scratch using modern tools."
+

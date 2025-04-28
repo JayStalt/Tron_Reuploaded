@@ -1,5 +1,5 @@
 
-// mcp.js – MCP Cone mini-game upgraded with multiple moving barriers and timer
+import { setEndGameDetails } from './endGame.js';
 
 const TILE_SIZE = 32;
 const GRID_WIDTH = 20;
@@ -14,18 +14,13 @@ let elapsedTimeMCP = 0;
 
 let inputBoundMCP = false;
 
-let sceneCallbackMCP = null;
-function setSceneCallbackMCP(callback) {
-    sceneCallbackMCP = callback;
+let sceneCallback = null;
+function setSceneCallback(callback) {
+    sceneCallback = callback;
 }
 
-// Player
-let playerMCP = {
-    x: 10,
-    y: 14
-};
+let playerMCP = { x: 10, y: 14 };
 
-// Obstacles (Barriers)
 let barriers = [
     { x: 0, y: 5, dir: 1, moveType: 'horizontal' },
     { x: 19, y: 8, dir: 3, moveType: 'horizontal' },
@@ -62,13 +57,13 @@ function updateBarriers() {
                 barrier.x++;
                 if (barrier.x >= GRID_WIDTH) {
                     barrier.x = GRID_WIDTH - 1;
-                    barrier.dir = 3; // switch to left
+                    barrier.dir = 3;
                 }
             } else if (barrier.dir === 3) {
                 barrier.x--;
                 if (barrier.x < 0) {
                     barrier.x = 0;
-                    barrier.dir = 1; // switch to right
+                    barrier.dir = 1;
                 }
             }
         } else if (barrier.moveType === 'vertical') {
@@ -76,13 +71,13 @@ function updateBarriers() {
                 barrier.y--;
                 if (barrier.y < 0) {
                     barrier.y = 0;
-                    barrier.dir = 2; // switch to down
+                    barrier.dir = 2;
                 }
             } else if (barrier.dir === 2) {
                 barrier.y++;
                 if (barrier.y >= GRID_HEIGHT) {
                     barrier.y = GRID_HEIGHT - 1;
-                    barrier.dir = 0; // switch to up
+                    barrier.dir = 0;
                 }
             }
         }
@@ -93,7 +88,8 @@ function checkBarrierCollision() {
     for (let barrier of barriers) {
         if (barrier.x === playerMCP.x && barrier.y === playerMCP.y) {
             console.log("Hit by barrier!");
-            if (sceneCallbackMCP) sceneCallbackMCP('endgame');
+            setEndGameDetails(1200, 25, false); // Player loss
+            if (sceneCallback) sceneCallback('endgame');
         }
     }
 }
@@ -101,7 +97,8 @@ function checkBarrierCollision() {
 function checkMCPWin() {
     if (playerMCP.y === 0) {
         console.log("You beat the MCP!");
-        if (sceneCallbackMCP) sceneCallbackMCP('endgame');
+        setEndGameDetails(2000, 50, true); // Special win
+        if (sceneCallback) sceneCallback('endgame');
     }
 }
 
@@ -120,22 +117,17 @@ function mcpGameLoop(context) {
 
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-    // Draw player
     context.fillStyle = "lime";
     context.fillRect(playerMCP.x * TILE_SIZE, playerMCP.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-    // Draw barriers
     context.fillStyle = "magenta";
     for (let barrier of barriers) {
         context.fillRect(barrier.x * TILE_SIZE, barrier.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
 
-    // Draw survival timer
     context.fillStyle = "white";
     context.font = "20px Arial";
     context.fillText(`Time: ${elapsedTimeMCP}s`, 10, 20);
 }
 
-export { mcpGameLoop, setSceneCallbackMCP as setSceneCallback };
-
-
+export { mcpGameLoop, setSceneCallback };

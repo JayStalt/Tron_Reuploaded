@@ -1,3 +1,4 @@
+import { playMusic, playEffect, stopMusic, sounds } from './soundManager.js';
 
 let sceneCallback = null;
 let endGameData = { score: 0, bonus: 0, won: false };
@@ -14,6 +15,18 @@ function setEndGameDetails(score, bonus, won) {
 }
 
 function drawEndGame(context) {
+    stopMusic();
+
+    if (endGameData.won) {
+        if (endGameData.score >= 2000) {
+            playMusic(sounds.victoryMusic); // TOTAL VICTORY
+        } else {
+            playEffect(sounds.miniGameSuccess); // Mini game success
+        }
+    } else {
+        playMusic(sounds.failMusic); // Loss
+    }
+
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     context.fillStyle = "white";

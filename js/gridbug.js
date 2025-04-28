@@ -1,7 +1,5 @@
 
-import { setEndGameDetails } from './endGame.js';
-import { unlockNextGame } from './menu.js';
-
+import { playEffect, sounds } from './soundManager.js';
 
 const TILE_SIZE = 32;
 const GRID_WIDTH = 20;
@@ -20,9 +18,9 @@ let elapsedTime = 0;
 
 let inputBoundGridbug = false;
 
-let sceneCallback = null;
+let sceneCallbackGridbug = null;
 function setSceneCallback(callback) {
-    sceneCallback = callback;
+    sceneCallbackGridbug = callback;
 }
 
 let playerGridbug = { x: 10, y: 7 };
@@ -57,6 +55,7 @@ function attemptZap() {
     const currentTime = performance.now();
     if (currentTime - lastZapTime < ZAP_COOLDOWN) return;
 
+    playEffect(sounds.zapEffect);
     gridbugs = gridbugs.filter(bug => {
         const dx = Math.abs(bug.x - playerGridbug.x);
         const dy = Math.abs(bug.y - playerGridbug.y);
@@ -90,10 +89,19 @@ function spawnNewGridbug() {
     let edge = Math.floor(Math.random() * 4);
     let newBug = { x: 0, y: 0 };
 
-    if (edge === 0) { newBug.x = Math.floor(Math.random() * GRID_WIDTH); newBug.y = 0; }
-    else if (edge === 1) { newBug.x = Math.floor(Math.random() * GRID_WIDTH); newBug.y = GRID_HEIGHT - 1; }
-    else if (edge === 2) { newBug.x = 0; newBug.y = Math.floor(Math.random() * GRID_HEIGHT); }
-    else if (edge === 3) { newBug.x = GRID_WIDTH - 1; newBug.y = Math.floor(Math.random() * GRID_HEIGHT); }
+    if (edge === 0) {
+        newBug.x = Math.floor(Math.random() * GRID_WIDTH);
+        newBug.y = 0;
+    } else if (edge === 1) {
+        newBug.x = Math.floor(Math.random() * GRID_WIDTH);
+        newBug.y = GRID_HEIGHT - 1;
+    } else if (edge === 2) {
+        newBug.x = 0;
+        newBug.y = Math.floor(Math.random() * GRID_HEIGHT);
+    } else if (edge === 3) {
+        newBug.x = GRID_WIDTH - 1;
+        newBug.y = Math.floor(Math.random() * GRID_HEIGHT);
+    }
 
     gridbugs.push(newBug);
 }
@@ -102,9 +110,7 @@ function checkGridbugCollision() {
     for (let bug of gridbugs) {
         if (bug.x === playerGridbug.x && bug.y === playerGridbug.y) {
             console.log("You were caught by a Gridbug!");
-            setEndGameDetails(400, 10, false); // Loss
-            if (sceneCallback) sceneCallback('endgame');
-            return;
+            if (sceneCallbackGridbug) sceneCallbackGridbug('endgame');
         }
     }
 }
@@ -112,17 +118,27 @@ function checkGridbugCollision() {
 function checkWinCondition() {
     if (elapsedTime >= 60) {
         console.log("You survived the Gridbugs!");
-        unlockNextGame('gridbug'); // <--- ADD THIS LINE
-        setEndGameDetails(800, 20, true);
-        if (sceneCallback) sceneCallback('endgame');
+        if (sceneCallbackGridbug) sceneCallbackGridbug('endgame');
     }
+}
+
+function resetGame() {
+    playerGridbug = { x: 10, y: 7 };
+    gridbugs = [
+        { x: 0, y: 0 },
+        { x: 19, y: 0 },
+        { x: 0, y: 14 },
+        { x: 19, y: 14 }
+    ];
+    startTime = performance.now();
+    elapsedTime = 0;
 }
 
 function gridbugGameLoop(context) {
     if (!inputBoundGridbug) {
         document.addEventListener("keydown", handleGridbugInput);
         inputBoundGridbug = true;
-        startTime = performance.now();
+        resetGame();
     }
 
     elapsedTime = Math.floor((performance.now() - startTime) / 1000);
@@ -147,4 +163,4 @@ function gridbugGameLoop(context) {
     context.fillText(`Time: ${elapsedTime}s`, 10, 20);
 }
 
-export { gridbugGameLoop, setSceneCallback };
+export { gridbugGameLoop, setSceneCallback, resetGame };

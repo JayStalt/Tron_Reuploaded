@@ -33,11 +33,7 @@ let grid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(0));
 let lastMoveTime = 0;
 let lastEnemyMoveTime = 0;
 
-// Helper: Get next tile position based on direction
-
-// Utility: returns the x/y position of the tile a character will move to next
 function getNextPosition(x, y, direction) {
-
     switch (direction) {
         case 'up':    return { x, y: y - 1 };
         case 'down':  return { x, y: y + 1 };
@@ -67,23 +63,17 @@ function getDistance(x1, y1, x2, y2) {
 function chooseAggressiveDirection(x, y) {
     const safeDirs = getSafeDirections(x, y);
     if (safeDirs.length === 0) return null;
-
     const dirScores = safeDirs.map(dir => {
         const { x: nx, y: ny } = getNextPosition(x, y, dir);
         const distToPlayer = getDistance(nx, ny, player.x, player.y);
         return { dir, score: -distToPlayer };
     });
-
     dirScores.sort((a, b) => b.score - a.score);
     return dirScores[0].dir;
 }
 
-
-// Handles enemy movement, AI decisions, and pre-move collision check with player
 function updateEnemyPosition() {
-
     if (!enemy.alive) return;
-
     const currentTime = performance.now();
     if (currentTime - lastEnemyMoveTime < MOVE_INTERVAL) return;
     lastEnemyMoveTime = currentTime;
@@ -93,8 +83,6 @@ function updateEnemyPosition() {
 
     const { x: nextX, y: nextY } = getNextPosition(enemy.x, enemy.y, enemy.direction);
 
-    // Check if enemy will move into player
-    // Collision detection: enemy moves into player's current position
     if (nextX === player.x && nextY === player.y) {
         console.log("Enemy collided with player!");
         setEndGameDetails(999, 12, false);
@@ -104,7 +92,6 @@ function updateEnemyPosition() {
 
     enemy.trail.push({ x: enemy.x, y: enemy.y });
     grid[enemy.y][enemy.x] = 'E';
-
     enemy.x = nextX;
     enemy.y = nextY;
 
@@ -118,20 +105,14 @@ function updateEnemyPosition() {
     }
 }
 
-
-// Handles player movement, trail logic, and pre-move collision check with enemy
 function updatePlayerPosition() {
-
     if (!player.hasMoved) return;
-
     const currentTime = performance.now();
     if (currentTime - lastMoveTime < MOVE_INTERVAL) return;
     lastMoveTime = currentTime;
 
     const { x: nextX, y: nextY } = getNextPosition(player.x, player.y, player.direction);
 
-    // Check if player will move into enemy
-    // Collision detection: player moves into enemy's current position
     if (nextX === enemy.x && nextY === enemy.y) {
         console.log("Player collided with enemy!");
         setEndGameDetails(650, 15, false);
@@ -141,7 +122,6 @@ function updatePlayerPosition() {
 
     player.trail.push({ x: player.x, y: player.y });
     grid[player.y][player.x] = 'P';
-
     player.x = nextX;
     player.y = nextY;
 
@@ -162,13 +142,11 @@ function resetGame() {
     player.direction = 'right';
     player.trail = [];
     player.hasMoved = false;
-
     enemy.x = 14;
     enemy.y = 7;
     enemy.direction = 'left';
     enemy.trail = [];
     enemy.alive = true;
-
     grid = Array.from({ length: GRID_HEIGHT }, () => Array(GRID_WIDTH).fill(0));
     lastMoveTime = 0;
     lastEnemyMoveTime = 0;

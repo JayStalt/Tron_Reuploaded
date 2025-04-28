@@ -1,43 +1,42 @@
 
-// endGame.js
+let sceneCallback = null;
+let endGameData = { score: 0, bonus: 0, won: false };
+let hasSetTimeout = false;
 
-let endMessage = "END OF GAME";
-let finalScore = 0;
-let finalRank = 1;
-let timeoutID = null;
+function setSceneCallback(callback) {
+    sceneCallback = callback;
+}
 
-function setEndGameDetails(score = 0, rank = 1, win = false) {
-    endMessage = win ? "CONGRATULATIONS" : "END OF GAME";
-    finalScore = score;
-    finalRank = rank;
-
-    // Automatically return to menu after 10 seconds
-    clearTimeout(timeoutID);
-    timeoutID = setTimeout(() => {
-        window.location.reload();
-    }, 10000);
+function setEndGameDetails(score, bonus, won) {
+    endGameData.score = score;
+    endGameData.bonus = bonus;
+    endGameData.won = won;
 }
 
 function drawEndGame(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-    context.fillStyle = "black";
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-
+    context.fillStyle = "white";
+    context.font = "28px Arial";
     context.textAlign = "center";
-    context.font = "28px monospace";
-    context.fillStyle = "yellow";
-    context.fillText("TRON", context.canvas.width / 2, 60);
 
-    context.font = "22px monospace";
-    context.fillStyle = "red";
-    context.fillText(finalScore.toString().padStart(4, "0"), context.canvas.width / 2, 100);
+    const resultText = endGameData.won ? "VICTORY!" : "GAME OVER";
 
-    context.fillStyle = "yellow";
-    context.fillText(endMessage, context.canvas.width / 2, 160);
-    context.fillText("YOUR SCORE", context.canvas.width / 2, 220);
-    context.fillText("RANKING IS", context.canvas.width / 2, 260);
-    context.fillText("NUMBER " + finalRank, context.canvas.width / 2, 300);
+    context.fillText(resultText, context.canvas.width / 2, 100);
+    context.fillText(`Score: ${endGameData.score}`, context.canvas.width / 2, 160);
+    context.fillText(`Bonus: ${endGameData.bonus}`, context.canvas.width / 2, 220);
+    context.fillText("Returning to Menu...", context.canvas.width / 2, 320);
+
+    // Only set the timeout once!
+    if (!hasSetTimeout && sceneCallback) {
+        hasSetTimeout = true;
+        console.log("Endgame: Timer started, will return to menu in 5 seconds...");
+        setTimeout(() => {
+            console.log("Endgame: Switching to menu now!");
+            sceneCallback('menu');
+            hasSetTimeout = false; // Reset for future endgames
+        }, 5000); // 5 second delay
+    }
 }
 
-export { drawEndGame, setEndGameDetails };
+export { drawEndGame, setSceneCallback, setEndGameDetails };

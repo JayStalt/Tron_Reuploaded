@@ -1,12 +1,12 @@
 
-// tank.js – Tank game with smarter aggressive enemy AI (no camping)
+import { resetUnlocks, unlockNextGame } from './menu.js';
 
 const TILE_SIZE = 32;
 const GRID_WIDTH = 20;
 const GRID_HEIGHT = 15;
 const MOVE_INTERVAL = 200;
 const ENEMY_MOVE_INTERVAL = 500;
-const ENEMY_SHOT_COOLDOWN = 500;
+const ENEMY_SHOT_COOLDOWN = 300;
 
 let lastMoveTime = 0;
 let lastShotTime = 0;
@@ -15,6 +15,7 @@ let lastEnemyShotTime = 0;
 const SHOT_COOLDOWN = 400;
 
 let inputBound = false;
+let playerAlive = true;
 
 let sceneCallback = null;
 function setSceneCallback(callback) {
@@ -89,23 +90,6 @@ function handleInput(event) {
     }
 }
 
-function canSeePlayer(enemy) {
-    if (enemy.x === player.x) {
-        const step = enemy.y < player.y ? 1 : -1;
-        for (let y = enemy.y + step; y !== player.y; y += step) {
-            if (maze[y][enemy.x] !== 0) return false;
-        }
-        return true;
-    } else if (enemy.y === player.y) {
-        const step = enemy.x < player.x ? 1 : -1;
-        for (let x = enemy.x + step; x !== player.x; x += step) {
-            if (maze[enemy.y][x] !== 0) return false;
-        }
-        return true;
-    }
-    return false;
-}
-
 function updateBullets() {
     player.bullets = player.bullets.filter(bullet => {
         bullet.x += bullet.dx * 0.2;
@@ -139,6 +123,8 @@ function updateBullets() {
 
             if (Math.floor(player.x) === gx && Math.floor(player.y) === gy) {
                 console.log("You were hit!");
+                playerAlive = false;
+                resetUnlocks();
                 if (sceneCallback) sceneCallback('endgame');
                 return false;
             }
@@ -150,35 +136,25 @@ function updateBullets() {
 
 function updateEnemies() {
     const currentTime = performance.now();
-
     if (currentTime - lastEnemyMoveTime > ENEMY_MOVE_INTERVAL) {
         lastEnemyMoveTime = currentTime;
         for (let enemy of enemies) {
             if (!enemy.alive) continue;
-
             const dx = player.x - enemy.x;
             const dy = player.y - enemy.y;
-
             if (Math.abs(dx) > Math.abs(dy)) {
                 enemy.dir = dx > 0 ? 1 : 3;
             } else {
                 enemy.dir = dy > 0 ? 2 : 0;
             }
-
             const { x: ox, y: oy } = getDirOffset(enemy.dir);
             const nx = enemy.x + ox;
             const ny = enemy.y + oy;
-
             if (maze[ny] && maze[ny][nx] === 0) {
                 enemy.x = nx;
                 enemy.y = ny;
             } else {
-                // If blocked, randomly rotate
-                if (Math.random() < 0.5) {
-                    enemy.dir = (enemy.dir + 1) % 4; // rotate right
-                } else {
-                    enemy.dir = (enemy.dir + 3) % 4; // rotate left
-                }
+                enemy.dir = Math.floor(Math.random() * 4);
             }
         }
     }
@@ -194,11 +170,30 @@ function updateEnemies() {
     }
 }
 
+function canSeePlayer(enemy) {
+    if (enemy.x === player.x) {
+        const step = enemy.y < player.y ? 1 : -1;
+        for (let y = enemy.y + step; y !== player.y; y += step) {
+            if (maze[y][enemy.x] !== 0) return false;
+        }
+        return true;
+    } else if (enemy.y === player.y) {
+        const step = enemy.x < player.x ? 1 : -1;
+        for (let x = enemy.x + step; x !== player.x; x += step) {
+            if (maze[enemy.y][x] !== 0) return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 function tankGameLoop(context) {
     if (!inputBound) {
         document.addEventListener("keydown", handleInput);
         inputBound = true;
     }
+
+    if (!playerAlive) return;
 
     updateBullets();
     updateEnemies();
@@ -214,38 +209,21 @@ function tankGameLoop(context) {
         }
     }
 
-    // Draw player tank
     context.fillStyle = "green";
     context.fillRect(player.x * TILE_SIZE, player.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 
-    // Draw cannon direction
     context.strokeStyle = "black";
     context.lineWidth = 2;
     context.beginPath();
-
     let centerX = player.x * TILE_SIZE + TILE_SIZE / 2;
     let centerY = player.y * TILE_SIZE + TILE_SIZE / 2;
-
     switch (player.dir) {
-        case 0: // Up
-            context.moveTo(centerX, centerY);
-            context.lineTo(centerX, centerY - TILE_SIZE / 2);
-            break;
-        case 1: // Right
-            context.moveTo(centerX, centerY);
-            context.lineTo(centerX + TILE_SIZE / 2, centerY);
-            break;
-        case 2: // Down
-            context.moveTo(centerX, centerY);
-            context.lineTo(centerX, centerY + TILE_SIZE / 2);
-            break;
-        case 3: // Left
-            context.moveTo(centerX, centerY);
-            context.lineTo(centerX - TILE_SIZE / 2, centerY);
-            break;
+        case 0: context.moveTo(centerX, centerY); context.lineTo(centerX, centerY - TILE_SIZE / 2); break;
+        case 1: context.moveTo(centerX, centerY); context.lineTo(centerX + TILE_SIZE / 2, centerY); break;
+        case 2: context.moveTo(centerX, centerY); context.lineTo(centerX, centerY + TILE_SIZE / 2); break;
+        case 3: context.moveTo(centerX, centerY); context.lineTo(centerX - TILE_SIZE / 2, centerY); break;
     }
     context.stroke();
-
 
     for (let enemy of enemies) {
         if (enemy.alive) {
@@ -272,8 +250,13 @@ function tankGameLoop(context) {
 
     if (enemies.every(e => !e.alive)) {
         console.log("You Win!");
+        unlockNextGame('tank'); // <--- add this line
         if (sceneCallback) sceneCallback('endgame');
     }
+
+
 }
 
 export { tankGameLoop, setSceneCallback };
+
+

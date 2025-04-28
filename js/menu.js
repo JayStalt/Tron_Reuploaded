@@ -1,63 +1,55 @@
 
-// menu.js
+const games = ["Lightcycle", "Tank", "Gridbug", "MCP"];
+const scenes = ["lightcycle", "tank", "gridbug", "mcp"];
 
-const menuOptions = ["Lightcycle", "Gridbug", "Tank", "MCP Cone"];
-let selectedOption = 0;
-
-// Initially only Lightcycle is unlocked
-let unlockedGames = [true, true, true, false];
+let unlockedGames = [true, false, false, false];
+let selectedIndex = 0;
 
 function drawMenu(context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
-    context.fillStyle = "black";
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-
-    context.fillStyle = "cyan";
-    context.font = "28px monospace";
+    context.fillStyle = "white";
+    context.font = "28px Arial";
     context.textAlign = "center";
-    context.fillText("TRON: REUPLOADED", context.canvas.width / 2, 60);
 
-    menuOptions.forEach((option, index) => {
-        const isSelected = index === selectedOption;
-        const isUnlocked = unlockedGames[index];
+    context.fillText("TRON_REUPLOADED", context.canvas.width / 2, 60);
 
-        context.fillStyle = isSelected ? "yellow" : isUnlocked ? "white" : "gray";
-        context.fillText(
-            isUnlocked ? option : "???",
-            context.canvas.width / 2,
-            140 + index * 40
-        );
-    });
+    for (let i = 0; i < games.length; i++) {
+        if (i === selectedIndex) {
+            context.fillStyle = "cyan";
+        } else {
+            context.fillStyle = "gray";
+        }
+
+        const displayName = unlockedGames[i] ? games[i] : "???";
+        context.fillText(displayName, context.canvas.width / 2, 150 + i * 60);
+    }
 }
 
-// Handle input to move selection or start game
 function handleMenuInput(event, changeSceneCallback) {
-    switch (event.key) {
-        case "ArrowUp":
-        case "w":
-            selectedOption = (selectedOption - 1 + menuOptions.length) % menuOptions.length;
-            break;
-        case "ArrowDown":
-        case "s":
-            selectedOption = (selectedOption + 1) % menuOptions.length;
-            break;
-        case "Enter":
-        case " ":
-            if (unlockedGames[selectedOption]) {
-                const selected = menuOptions[selectedOption].toLowerCase().replace(" ", "");
-                changeSceneCallback(selected); // Call back to main.js to switch scene
-            }
-            break;
+    if (event.key === "ArrowUp" || event.key === "w") {
+        selectedIndex = (selectedIndex - 1 + games.length) % games.length;
+    } else if (event.key === "ArrowDown" || event.key === "s") {
+        selectedIndex = (selectedIndex + 1) % games.length;
+    } else if (event.key === "Enter" || event.key === " ") {
+        if (unlockedGames[selectedIndex]) {
+            changeSceneCallback(scenes[selectedIndex]);
+        }
     }
 }
 
-// Unlock the next game in the sequence
-function unlockNextGame(current) {
-    const index = menuOptions.findIndex(opt => opt.toLowerCase().replace(" ", "") === current);
-    if (index < unlockedGames.length - 1) {
-        unlockedGames[index + 1] = true;
+function unlockNextGame(currentGame) {
+    if (currentGame === 'lightcycle') {
+        unlockedGames[1] = true;
+    } else if (currentGame === 'tank') {
+        unlockedGames[2] = true;
+    } else if (currentGame === 'gridbug') {
+        unlockedGames[3] = true;
     }
 }
 
-export { drawMenu, handleMenuInput, unlockNextGame };
+function resetUnlocks() {
+    unlockedGames = [true, false, false, false];
+}
+
+export { drawMenu, handleMenuInput, unlockNextGame, resetUnlocks };
